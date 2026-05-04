@@ -1,3 +1,4 @@
+import { ThemeContext } from '@/components/theme-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Feather } from '@expo/vector-icons';
@@ -5,9 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-
 
 export default function SettingsScreen() {
   const [name, setName] = useState('Hassan Tahir');
@@ -17,20 +17,21 @@ export default function SettingsScreen() {
   // const [isLocked, setIsLocked] = useState(false);
   const [editField, setEditField] = useState<'name' | 'username' | null>(null);
   const [tempValue, setTempValue] = useState('');
+  const { dark, toggleTheme } = useContext(ThemeContext);
 
-    useEffect(() => {
-    const check = async () => {
-      const token = await AsyncStorage.getItem('token');
+  //   useEffect(() => {
+  //   const check = async () => {
+  //     const token = await AsyncStorage.getItem('token');
 
-      if (token) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/(auth-jwt)/login-jwt');
-      }
-    };
+  //     if (token) {
+  //       router.replace('/(tabs)');
+  //     } else {
+  //       router.replace('/(auth-jwt)/login-jwt');
+  //     }
+  //   };
 
-    check();
-  }, []);
+  //   check();
+  // }, []);
 
   const openEdit = (field: 'name' | 'username') => {
     if (field === 'username' && usernameLocked) {
@@ -192,8 +193,11 @@ export default function SettingsScreen() {
             <ThemedText style={styles.item}>🔔 Notifications</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress = {toggleTheme}>
             <ThemedText style={styles.item}>🌙 Dark Mode</ThemedText>
+            <ThemedText style = {{ color: dark ? 'green' : 'gray'}}>
+              {dark ? 'Enabled' : 'Disabled'}
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.row}>

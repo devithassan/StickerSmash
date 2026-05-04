@@ -19,7 +19,7 @@ export default function SignupJWT() {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch('http://192.168.1.22:3000/signup', {
+      const res = await fetch('http://192.168.100.17:3000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

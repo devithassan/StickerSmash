@@ -65,5 +65,5 @@ app.get('/profile', (req, res) => {
 
 /* ================= SERVER ================= */
 app.listen(3000, '0.0.0.0', () => {
-  console.log('Server running on http://192.168.1.22:3000');
+  console.log('Server running on http://192.168.100.17:3000');
 });
