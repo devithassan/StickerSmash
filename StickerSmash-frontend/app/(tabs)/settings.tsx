@@ -7,31 +7,31 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { router } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
 export default function SettingsScreen() {
+  const { dark, toggleTheme, colors } = useContext(ThemeContext);
+
   const [name, setName] = useState('Hassan Tahir');
   const [username, setUsername] = useState('');
   const [tempName, setTempName] = useState('');
   const [usernameLocked, setUsernameLocked] = useState(false);
-  // const [isLocked, setIsLocked] = useState(false);
   const [editField, setEditField] = useState<'name' | 'username' | null>(null);
   const [tempValue, setTempValue] = useState('');
-  const { dark, toggleTheme } = useContext(ThemeContext);
-
-  //   useEffect(() => {
-  //   const check = async () => {
-  //     const token = await AsyncStorage.getItem('token');
-
-  //     if (token) {
-  //       router.replace('/(tabs)');
-  //     } else {
-  //       router.replace('/(auth-jwt)/login-jwt');
-  //     }
-  //   };
-
-  //   check();
-  // }, []);
+  const [avatar, setAvatar] = useState<string | null>(null);
 
   const openEdit = (field: 'name' | 'username') => {
     if (field === 'username' && usernameLocked) {
@@ -46,10 +46,7 @@ export default function SettingsScreen() {
   const saveEdit = () => {
     if (!tempValue.trim()) return;
 
-    if (editField === 'name') {
-      setName(tempValue);
-    }
-
+    if (editField === 'name') setName(tempValue);
     if (editField === 'username') {
       setUsername(tempValue);
       setUsernameLocked(true);
@@ -58,89 +55,63 @@ export default function SettingsScreen() {
     setEditField(null);
   };
 
-
-  const [avatar, setAvatar] = useState<string | null>(null);
-
   useEffect(() => {
     (async () => {
-      const camera = await ImagePicker.requestCameraPermissionsAsync();
-      const gallery = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      const media = await MediaLibrary.requestPermissionsAsync();
-  
-      if (!camera.granted || !gallery.granted || !media.granted) {
-        Alert.alert('Permission required', 'Please allow camera & gallery access');
-      }
+      await ImagePicker.requestCameraPermissionsAsync();
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
     })();
   }, []);
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
 
-    const pickImage = async () => {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
+  };
 
-      if (!permission.granted) {
-          alert("Permission required");
-          return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          quality: 1,
-      });
-
-      if (result.canceled || !result.assets?.length) return;
-
-      const uri = result.assets[0].uri;
-
-      console.log("FINAL URI:", uri);
-
-      setAvatar(uri);
-      };
   const takePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
-  
-    if (!result.canceled){
+
+    if (!result.canceled) {
       setAvatar(result.assets[0].uri);
     }
   };
 
   const chooseImage = () => {
-    Alert.alert(
-      'Profile Picture',
-      'Choose an option',
-      [
-        { text: '📷 Take Photo', onPress: takePhoto },
-        { text: '🖼 Pick from Gallery', onPress: pickImage },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+    Alert.alert('Profile Picture', 'Choose an option', [
+      { text: '📷 Take Photo', onPress: takePhoto },
+      { text: '🖼 Pick from Gallery', onPress: pickImage },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
-
-  // useEffect(() => {
-  //   (async () => {
-  //     await ImagePicker.requestCameraPermissionsAsync();
-  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   })();
-  // }, []);
 
   const logout = async () => {
     await AsyncStorage.removeItem('token');
-
-    console.log('🚪 Logging out...');
-
     router.replace('/(auth-jwt)/login-jwt');
   };
 
   return (
     <>
-      <ScrollView style = {{flex:1 }} contentContainerStyle={styles.container}>
+      <ScrollView
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: colors.background }
+        ]}
+      >
 
         {/* PROFILE */}
-        <ThemedView style={styles.profileCard}>
-          
+        <ThemedView style={[styles.profileCard, { backgroundColor: colors.card }]}>
+
           <Pressable onPress={chooseImage}>
             <Image
               source={
@@ -157,28 +128,34 @@ export default function SettingsScreen() {
             {/* NAME */}
             <View style={styles.row}>
               <View>
-                <ThemedText style={styles.name}>{name}</ThemedText>
-                <ThemedText style={styles.subText}>Name</ThemedText>
+                <ThemedText style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
+                  {name}
+                </ThemedText>
+
+                <ThemedText style={{ color: colors.text, opacity: 0.6 }}>
+                  Name
+                </ThemedText>
               </View>
 
               <Pressable onPress={() => openEdit('name')}>
-                <Feather name="edit-2" size={18} color="black" />
+                <Feather name="edit-2" size={18} color={colors.text} />
               </Pressable>
             </View>
 
             {/* USERNAME */}
             <View style={styles.row}>
               <View>
-                <ThemedText style={styles.name}>
+                <ThemedText style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
                   {username ? `@${username}` : 'Set username'}
                 </ThemedText>
-                <ThemedText style={styles.subText}>
+
+                <ThemedText style={{ color: colors.text, opacity: 0.6 }}>
                   One time only
                 </ThemedText>
               </View>
 
               <Pressable onPress={() => openEdit('username')}>
-                <Feather name="edit-2" size={18} color="black" />
+                <Feather name="edit-2" size={18} color={colors.text} />
               </Pressable>
             </View>
 
@@ -186,81 +163,89 @@ export default function SettingsScreen() {
         </ThemedView>
 
         {/* SETTINGS */}
-        <ThemedView style={styles.card}>
-          <ThemedText style={styles.title}>General</ThemedText>
+        <ThemedView style={[styles.card, { backgroundColor: colors.card }]}>
+          <ThemedText style={{ color: colors.text, fontSize: 16, fontWeight: 'bold' }}>
+            General
+          </ThemedText>
 
           <TouchableOpacity style={styles.row}>
-            <ThemedText style={styles.item}>🔔 Notifications</ThemedText>
+            <ThemedText style={{ color: colors.text }}>🔔 Notifications</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.row} onPress = {toggleTheme}>
-            <ThemedText style={styles.item}>🌙 Dark Mode</ThemedText>
-            <ThemedText style = {{ color: dark ? 'green' : 'gray'}}>
+          <TouchableOpacity style={styles.row} onPress={toggleTheme}>
+            <ThemedText style={{ color: colors.text }}>🌙 Dark Mode</ThemedText>
+            <ThemedText style={{ color: dark ? colors.primary : colors.text, opacity: 0.6 }}>
               {dark ? 'Enabled' : 'Disabled'}
             </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.row}>
-            <ThemedText style={styles.item}>🌍 Language</ThemedText>
+            <ThemedText style={{ color: colors.text }}>🌍 Language</ThemedText>
           </TouchableOpacity>
         </ThemedView>
 
-          {/* 📊 DATA SECTION */}
-        <ThemedView style={styles.card}>
-          <ThemedText style={styles.title}>Data</ThemedText>
+        {/* DATA */}
+        <ThemedView style={[styles.card, { backgroundColor: colors.card }]}>
+          <ThemedText style={{ color: colors.text, fontSize: 16, fontWeight: 'bold' }}>
+            Data
+          </ThemedText>
 
           <TouchableOpacity style={styles.row}>
-            <ThemedText style={styles.item}>📊 Reset Data</ThemedText>
+            <ThemedText style={{ color: colors.text }}>📊 Reset Data</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.row}>
-            <ThemedText style={styles.item}>💾 Backup Data</ThemedText>
+            <ThemedText style={{ color: colors.text }}>💾 Backup Data</ThemedText>
           </TouchableOpacity>
         </ThemedView>
 
-        {/* ℹ️ ABOUT */}
-        <ThemedView style={styles.card}>
-          <ThemedText style={styles.title}>About</ThemedText>
+        {/* ABOUT */}
+        <ThemedView style={[styles.card, { backgroundColor: colors.card }]}>
+          <ThemedText style={{ color: colors.text, fontSize: 16, fontWeight: 'bold' }}>
+            About
+          </ThemedText>
 
-          <ThemedText style={styles.item}>Version: 1.0.0</ThemedText>
-          <ThemedText style={styles.item}>Made with React Native</ThemedText>
+          <ThemedText style={{ color: colors.text }}>Version: 1.0.0</ThemedText>
+          <ThemedText style={{ color: colors.text }}>Made with React Native</ThemedText>
         </ThemedView>
-              {/* Logout button */}
-        <TouchableOpacity style = {styles.logoutBtn} onPress={logout}>
-          <ThemedText style = {styles.logoutText}>🚪 Logout</ThemedText>
+
+        {/* LOGOUT */}
+        <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+          <ThemedText style={styles.logoutText}>🚪 Logout</ThemedText>
         </TouchableOpacity>
 
       </ScrollView>
 
-      {/* MODAL (FIXED WRAPPER) */}
+      {/* MODAL */}
       {editField && (
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalWrapper}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-
-            <View style={styles.modal}>
-                       
-              
+            <View style={[styles.modal, { backgroundColor: colors.card }]}>
               <TextInput
                 value={tempValue}
                 onChangeText={setTempValue}
                 placeholder={`Enter ${editField}`}
-                style={styles.input}
+                placeholderTextColor={colors.text + '99'}
+                style={[
+                  styles.input,
+                  { color: colors.text, borderColor: colors.border }
+                ]}
                 autoFocus
-                returnKeyType="done"
-                blurOnSubmit
               />
 
-              <Pressable onPress={saveEdit} style={styles.saveBtn}>
+              <Pressable
+                onPress={saveEdit}
+                style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+              >
                 <ThemedText>Save</ThemedText>
               </Pressable>
 
               <Pressable onPress={() => setEditField(null)}>
-                <ThemedText>Cancel</ThemedText>
+                <ThemedText style={{ color: colors.text }}>Cancel</ThemedText>
               </Pressable>
-
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -284,7 +269,6 @@ const styles = StyleSheet.create({
     gap: 15,
     padding: 15,
     borderRadius: 16,
-    backgroundColor: '#a85454',
     elevation: 3,
   },
 
@@ -309,7 +293,6 @@ const styles = StyleSheet.create({
   card: {
     padding: 15,
     borderRadius: 16,
-    backgroundColor: '#ffffff',
     gap: 10,
     elevation: 2,
   },
@@ -317,7 +300,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000',
   },
 
   row: {
@@ -326,19 +308,17 @@ const styles = StyleSheet.create({
 
   item: {
     fontSize: 14,
-    color: '#333',
+
   },
 
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
   },
 
   saveBtn: {
-    backgroundColor: '#A1CEDC',
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
@@ -346,13 +326,11 @@ const styles = StyleSheet.create({
   },
   modal: {
 
-    backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     gap: 10,
-    // elevation: 5,
-    marginBottom: 10,
+
   },
   modalWrapper: {
     position: 'absolute',

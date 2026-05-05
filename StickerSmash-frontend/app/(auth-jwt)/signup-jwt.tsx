@@ -1,3 +1,4 @@
+import { useTheme } from '@/components/theme-context';
 import { ThemedText } from '@/components/themed-text';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -14,12 +15,14 @@ import {
 } from 'react-native';
 
 export default function SignupJWT() {
+  const { dark } = useTheme();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignup = async () => {
     try {
-      const res = await fetch('http://192.168.100.17:3000/signup', {
+      const res = await fetch('http://192.168.1.42:3000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,9 +39,7 @@ export default function SignupJWT() {
 
       Alert.alert('Success ✅', 'Account created');
 
-      // 👉 Optional: auto redirect to login
       router.replace('/(auth-jwt)/login-jwt' as any);
-
     } catch (err) {
       Alert.alert('Error', 'Server not reachable');
       console.log(err);
@@ -51,13 +52,25 @@ export default function SignupJWT() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: dark ? '#000' : '#f5f5f5' },
+          ]}
+        >
           <ThemedText type="title">Create Account 🧾</ThemedText>
 
           <TextInput
             placeholder="Username"
-            style={styles.input}
+            placeholderTextColor={dark ? '#aaa' : '#666'}
+            style={[
+              styles.input,
+              {
+                backgroundColor: dark ? '#1a1a1a' : '#fff',
+                color: dark ? '#fff' : '#000',
+                borderColor: dark ? '#333' : '#ccc',
+              },
+            ]}
             value={username}
             onChangeText={setUsername}
           />
@@ -65,19 +78,40 @@ export default function SignupJWT() {
           <TextInput
             placeholder="Password"
             secureTextEntry
-            style={styles.input}
+            placeholderTextColor={dark ? '#aaa' : '#666'}
+            style={[
+              styles.input,
+              {
+                backgroundColor: dark ? '#1a1a1a' : '#fff',
+                color: dark ? '#fff' : '#000',
+                borderColor: dark ? '#333' : '#ccc',
+              },
+            ]}
             value={password}
             onChangeText={setPassword}
           />
 
-          <Pressable style={styles.btn} onPress={handleSignup}>
+          <Pressable
+            style={[
+              styles.btn,
+              { backgroundColor: dark ? '#2d7a8c' : '#A1CEDC' },
+            ]}
+            onPress={handleSignup}
+          >
             <ThemedText>Sign Up</ThemedText>
           </Pressable>
 
           <Pressable onPress={() => router.push('/(auth-jwt)/login-jwt')}>
-            <ThemedText>Already have an account? Login</ThemedText>
+            <ThemedText
+              style={{
+                textAlign: 'center',
+                marginTop: 15,
+                color: dark ? '#fff' : '#000',
+              }}
+            >
+              Already have an account? Login
+            </ThemedText>
           </Pressable>
-
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -95,10 +129,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 12,
     borderRadius: 10,
-    backgroundColor: '#fff',
   },
   btn: {
-    backgroundColor: '#A1CEDC',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',

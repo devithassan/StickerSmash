@@ -1,3 +1,4 @@
+import { useTheme } from '@/components/theme-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,6 +7,7 @@ import { useState } from 'react';
 import { Keyboard, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 
 export default function BMI() {
+  const { colors } = useTheme();
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [bmi, setBmi] = useState<string | null>(null);
@@ -49,43 +51,59 @@ export default function BMI() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ThemedView style={styles.container}>
+      <ThemedView style={[styles.container, {backgroundColor: colors.background}]}>
 
         {/* 🔙 BACK BUTTON */}
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ThemedText style={styles.backText}>← Back</ThemedText>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backBtn, {backgroundColor: colors.card}]}>
+          <ThemedText style={{color:colors.primary}}>← Back</ThemedText>
         </TouchableOpacity>
 
-        <ThemedText type="title">BMI Calculator 🧮</ThemedText>
+        <ThemedText type="title" style = {{color: colors.text}}>BMI Calculator 🧮</ThemedText>
 
         {/* Height Input */}
         <TextInput
           placeholder="Height (cm)"
+          placeholderTextColor={colors.text + '80'}
           keyboardType="numeric"
           value={height}
           onChangeText={setHeight}
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              borderColor: colors.border,
+              color: colors.text,
+              backgroundColor: colors.card,
+            }
+          ]}
         />
 
         {/* Weight Input */}
         <TextInput
           placeholder="Weight (kg)"
+          placeholderTextColor={colors.text + '80'}
           keyboardType="numeric"
           value={weight}
           onChangeText={setWeight}
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              borderColor: colors.border,
+              color: colors.text,
+              backgroundColor: colors.card,
+            }
+          ]}
         />
 
         {/* Button */}
-        <TouchableOpacity style={styles.button} onPress={calculateBMI}>
-          <ThemedText>Calculate</ThemedText>
+        <TouchableOpacity style={[styles.button, {backgroundColor: colors.primary}]} onPress={calculateBMI}>
+          <ThemedText style={{ color: '#fff' }}>Calculate</ThemedText>
         </TouchableOpacity>
 
         {/* Result */}
         {bmi && (
           <>
-            <ThemedText style={styles.result}>Your BMI: {bmi}</ThemedText>
-            <ThemedText style={styles.category}>{category}</ThemedText>
+            <ThemedText style={[styles.result, { color: colors.text }]}>Your BMI: {bmi}</ThemedText>
+            <ThemedText style={[styles.category, { color: colors.text, opacity: 0.7 }]}>{category}</ThemedText>
           </>
         )}
       </ThemedView>
@@ -106,26 +124,20 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#1e293b',
     borderRadius: 10,
   },
 
   backText: {
-    color: '#38bdf8',
     fontWeight: 'bold',
   },
 
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
     padding: 12,
     borderRadius: 10,
-    color: '#fff',
-    backgroundColor: "#222",
   },
 
   button: {
-    backgroundColor: '#A1CEDC',
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',

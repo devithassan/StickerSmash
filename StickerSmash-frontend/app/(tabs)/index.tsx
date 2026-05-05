@@ -2,52 +2,49 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { useTheme } from '@/components/theme-context';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 
 type BMIData = {
   value: string;
   category: string;
 };
+
 export default function HomeScreen() {
+  const { colors } = useTheme();
+
   const [bmiData, setBmiData] = useState<BMIData | null>(null);
 
   useEffect(() => {
     const loadBMI = async () => {
-      try {
-        const data = await AsyncStorage.getItem('bmi');
-
-        if (data) {
-          setBmiData(JSON.parse(data));
-        }
-      } catch (e) {
-        console.log('BMI load error:', e);
-      }
+      const data = await AsyncStorage.getItem('bmi');
+      if (data) setBmiData(JSON.parse(data));
     };
-
     loadBMI();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
       const loadBMI = async () => {
-        try {
-          const data = await AsyncStorage.getItem('bmi');
-
-          if (data) {
-            setBmiData(JSON.parse(data));
-          }
-        } catch (e) {
-          console.log('BMI load error:', e);
-        }
+        const data = await AsyncStorage.getItem('bmi');
+        if (data) setBmiData(JSON.parse(data));
       };
-
       loadBMI();
     }, [])
   );
 
+// ... keep EVERYTHING same above
+
   return (
-    <ScrollView style={{ backgroundColor: '#0f172a' }}>
-      <View style={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }}>
+
+      <ThemedView style={[
+        styles.container,
+        { backgroundColor: colors.background }
+      ]}>
 
         {/* HERO IMAGE */}
         <Image
@@ -56,66 +53,129 @@ export default function HomeScreen() {
         />
 
         {/* HEADER */}
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>💪 Fitness Dashboard</Text>
-          <Text style={styles.subtitle}>
+        <ThemedView style={[styles.textContainer, {backgroundColor: colors.background}]}>
+          <ThemedText type="title" style={{ color: colors.text }}>
+            💪 Fitness Dashboard
+          </ThemedText>
+
+          <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
             Track your progress and stay consistent every day.
-          </Text>
-        </View>
+          </ThemedText>
+        </ThemedView>
 
         {/* QUICK STATS */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>
+        <ThemedView style={[styles.statsContainer, {backgroundColor: colors.background}]}>
+
+          <ThemedView style={[
+            styles.statBox,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              elevation: 2,
+            }
+          ]}>
+            <ThemedText type="subtitle" style={{ color: colors.text }}>
               {bmiData?.value ?? '--'}
-            </Text>
-            <Text style={styles.statLabel}>BMI</Text>
+            </ThemedText>
 
-            {/* optional category */}
+            <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
+              BMI
+            </ThemedText>
+
             {bmiData?.category && (
-              <Text style={{ color: '#94a3b8', fontSize: 11 }}>
+              <ThemedText style={{
+                fontSize: 11,
+                color: colors.text,
+                opacity: 0.6
+              }}>
                 {bmiData.category}
-              </Text>
+              </ThemedText>
             )}
-          </View>
+          </ThemedView>
 
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>1800</Text>
-            <Text style={styles.statLabel}>Calories</Text>
-          </View>
+          <ThemedView style={[
+            styles.statBox,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              elevation: 2,
+            }
+          ]}>
+            <ThemedText type="subtitle" style={{ color: colors.text }}>
+              1800
+            </ThemedText>
 
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>5</Text>
-            <Text style={styles.statLabel}>Day Streak</Text>
-          </View>
-        </View>
+            <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
+              Calories
+            </ThemedText>
+          </ThemedView>
+
+          <ThemedView style={[
+            styles.statBox,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              elevation: 2,
+            }
+          ]}>
+            <ThemedText type="subtitle" style={{ color: colors.text }}>
+              5
+            </ThemedText>
+
+            <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
+              Day Streak
+            </ThemedText>
+          </ThemedView>
+
+        </ThemedView>
 
         {/* FEATURE CARDS */}
         <TouchableOpacity
-          style={styles.card}
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              elevation: 2,
+            }
+          ]}
           onPress={() => router.push('/bmi')}
         >
-          <Text style={styles.cardTitle}>📊 BMI Calculator</Text>
-          <Text style={styles.cardText}>Check your body index instantly</Text>
+          <ThemedText type="defaultSemiBold" style={{ color: colors.text }}>
+            📊 BMI Calculator
+          </ThemedText>
+
+          <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
+            Check your body index instantly
+          </ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.card}
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              elevation: 2,
+            }
+          ]}
           onPress={() => router.push('/calorie')}
         >
-          <Text style={styles.cardTitle}>🔥 Calorie Tracker</Text>
-          <Text style={styles.cardText}>Track daily nutrition easily</Text>
+          <ThemedText type="defaultSemiBold" style={{ color: colors.text }}>
+            🔥 Calorie Tracker
+          </ThemedText>
+
+          <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
+            Track daily nutrition easily
+          </ThemedText>
         </TouchableOpacity>
 
-        {/* <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/workouts')}
-        >
-          <Text style={styles.cardTitle}>🏋️ Workouts</Text>
-          <Text style={styles.cardText}>Start your training session</Text>
-        </TouchableOpacity> */}
-
-      </View>
+      </ThemedView>
     </ScrollView>
   );
 }
@@ -128,24 +188,13 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: 200,
-    borderRadius: 20,
+    borderRadius: 16,
     marginBottom: 20,
   },
 
   textContainer: {
     marginBottom: 20,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-
-  subtitle: {
-    fontSize: 14,
-    color: '#cbd5e1',
-    marginTop: 5,
+    gap: 5,
   },
 
   statsContainer: {
@@ -156,41 +205,15 @@ const styles = StyleSheet.create({
 
   statBox: {
     flex: 1,
-    backgroundColor: '#1e293b',
     marginHorizontal: 5,
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 16,
     alignItems: 'center',
   },
 
-  statNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-
-  statLabel: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginTop: 5,
-  },
-
   card: {
-    backgroundColor: '#1e293b',
-    padding: 18,
-    borderRadius: 18,
+    padding: 15,
+    borderRadius: 16,
     marginBottom: 15,
-  },
-
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-
-  cardText: {
-    fontSize: 13,
-    color: '#94a3b8',
-    marginTop: 5,
   },
 });

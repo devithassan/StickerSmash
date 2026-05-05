@@ -1,19 +1,21 @@
-import { ThemeContext } from '@/components/theme-context';
+import { useTheme } from '@/components/theme-context';
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { useContext } from 'react';
 
 export default function TabsLayout() {
-  const { dark } = useContext(ThemeContext);
+  const { dark, colors } = useTheme(); // ✅ CHANGED
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#38bdf8',
+
+        // ✅ CHANGED (no hardcoding)
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: 'gray',
+
         tabBarStyle: {
-          backgroundColor: dark ? '#0f172a' : '#ffffff',
+          backgroundColor: colors.background, // ✅ CHANGED
           borderTopWidth: 0,
           height: 60,
         },
