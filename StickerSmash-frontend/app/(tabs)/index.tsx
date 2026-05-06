@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@/components/theme-context';
@@ -18,13 +18,13 @@ export default function HomeScreen() {
 
   const [bmiData, setBmiData] = useState<BMIData | null>(null);
 
-  useEffect(() => {
-    const loadBMI = async () => {
-      const data = await AsyncStorage.getItem('bmi');
-      if (data) setBmiData(JSON.parse(data));
-    };
-    loadBMI();
-  }, []);
+  // useEffect(() => {
+  //   const loadBMI = async () => {
+  //     const data = await AsyncStorage.getItem('bmi');
+  //     if (data) setBmiData(JSON.parse(data));
+  //   };
+  //   loadBMI();
+  // }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -71,7 +71,7 @@ export default function HomeScreen() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
+              // borderWidth: 1,
               elevation: 2,
             }
           ]}>
@@ -99,7 +99,7 @@ export default function HomeScreen() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
+              // borderWidth: 1,
               elevation: 2,
             }
           ]}>
@@ -117,7 +117,7 @@ export default function HomeScreen() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
+              // borderWidth: 1,
               elevation: 2,
             }
           ]}>
@@ -139,7 +139,7 @@ export default function HomeScreen() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
+              // borderWidth: 1,
               elevation: 2,
             }
           ]}
@@ -160,7 +160,7 @@ export default function HomeScreen() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
+              // borderWidth: 1,
               elevation: 2,
             }
           ]}
@@ -173,6 +173,27 @@ export default function HomeScreen() {
           <ThemedText style={{ color: colors.text, opacity: 0.7 }}>
             Track daily nutrition easily
           </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              elevation: 2,
+            }
+          ]}
+          onPress={() => router.push('/history')}
+        >
+          <ThemedText type = "defaultSemiBold" style = {{color: colors.text}}>
+            📅 View History
+          </ThemedText>
+
+          <ThemedText style={{color: colors.text, opacity: 0.7}}>
+            See your past BMI records
+          </ThemedText>
+
         </TouchableOpacity>
 
       </ThemedView>

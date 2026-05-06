@@ -31,7 +31,7 @@ export default function LoginJWT() {
     try {
       console.log('🌐 Sending request to backend...');
 
-      const res = await fetch('http://192.168.1.42:3000/login', {
+      const res = await fetch('http://192.168.1.22:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Keyboard, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
 export default function BMI() {
   const { colors } = useTheme();
@@ -40,27 +40,55 @@ export default function BMI() {
     setBmi(result);
     setCategory(cat);
 
+  };
+  const saveBMI = async () => {
+    if (!bmi || !category) return;
+
     await AsyncStorage.setItem(
       'bmi',
       JSON.stringify({
-        value: result,
-        category: cat,
+        value: bmi,
+        category: category,
       })
     );
+
+    const existing = await AsyncStorage.getItem('bmi_history');
+    const history = existing ? JSON.parse(existing) : [];
+
+    const newEntry = {
+      value: bmi,
+      category: category,
+      date: new Date().toISOString(),
+    };
+
+    history.unshift(newEntry);
+    await AsyncStorage.setItem('bmi_history', JSON.stringify(history));
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ThemedView style={[styles.container, {backgroundColor: colors.background}]}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: colors.background }
+      ]}
+    >
 
-        {/* 🔙 BACK BUTTON */}
-        <TouchableOpacity onPress={() => router.back()} style={[styles.backBtn, {backgroundColor: colors.card}]}>
-          <ThemedText style={{color:colors.primary}}>← Back</ThemedText>
+      {/* HEADER */}
+      <ThemedView style={[styles.header, { backgroundColor: colors.background }]}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ThemedText style={{ color: colors.text, fontSize: 22, fontWeight: 'bold' }}>
+            ←
+          </ThemedText>
         </TouchableOpacity>
 
-        <ThemedText type="title" style = {{color: colors.text}}>BMI Calculator 🧮</ThemedText>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
+          BMI Calculator
+        </ThemedText>
+      </ThemedView>
 
-        {/* Height Input */}
+      {/* INPUT CARD */}
+      <ThemedView style={[styles.card, { backgroundColor: colors.card }]}>
+
         <TextInput
           placeholder="Height (cm)"
           placeholderTextColor={colors.text + '80'}
@@ -70,14 +98,13 @@ export default function BMI() {
           style={[
             styles.input,
             {
-              borderColor: colors.border,
+              backgroundColor: colors.background,
               color: colors.text,
-              backgroundColor: colors.card,
+              borderColor: colors.border,
             }
           ]}
         />
 
-        {/* Weight Input */}
         <TextInput
           placeholder="Weight (kg)"
           placeholderTextColor={colors.text + '80'}
@@ -87,68 +114,117 @@ export default function BMI() {
           style={[
             styles.input,
             {
-              borderColor: colors.border,
+              backgroundColor: colors.background,
               color: colors.text,
-              backgroundColor: colors.card,
+              borderColor: colors.border,
             }
           ]}
         />
 
-        {/* Button */}
-        <TouchableOpacity style={[styles.button, {backgroundColor: colors.primary}]} onPress={calculateBMI}>
-          <ThemedText style={{ color: '#fff' }}>Calculate</ThemedText>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={calculateBMI}
+        >
+          <ThemedText style={styles.buttonText}>Calculate BMI</ThemedText>
         </TouchableOpacity>
 
-        {/* Result */}
-        {bmi && (
-          <>
-            <ThemedText style={[styles.result, { color: colors.text }]}>Your BMI: {bmi}</ThemedText>
-            <ThemedText style={[styles.category, { color: colors.text, opacity: 0.7 }]}>{category}</ThemedText>
-          </>
-        )}
+        {/* <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={saveBMI}
+        >
+          <ThemedText style={styles.buttonText}>Update BMI</ThemedText>
+        </TouchableOpacity> */}
+
       </ThemedView>
-    </TouchableWithoutFeedback>
+
+      {/* RESULT CARD */}
+      {bmi && (
+        <ThemedView style={[styles.resultCard, { backgroundColor: colors.primary }]}>
+          <ThemedText style={styles.resultText}>
+            ⚖️ {bmi}
+          </ThemedText>
+
+          <ThemedText style={styles.categoryText}>
+            {category}
+          </ThemedText>
+
+          <TouchableOpacity
+            onPress={saveBMI}
+            style={styles.button}
+          >
+            <ThemedText style={styles.buttonText}>
+              Save 
+            </ThemedText>
+          </TouchableOpacity>
+
+
+        </ThemedView>
+        
+      )}
+
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
-    justifyContent: 'center',
-    gap: 10,
   },
 
-  backBtn: {
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    gap: 12,
   },
 
-  backText: {
+  title: {
+    fontSize: 22,
     fontWeight: 'bold',
   },
 
+  card: {
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    gap: 10,
+  },
+
   input: {
-    borderWidth: 1,
     padding: 12,
     borderRadius: 10,
+    borderWidth: 1,
   },
 
   button: {
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',
+    marginTop: 6,
   },
 
-  result: {
-    fontSize: 20,
-    marginTop: 10,
+  buttonText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
 
-  category: {
+  resultCard: {
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+
+  resultText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+
+  categoryText: {
     fontSize: 16,
+    color: '#000',
+    marginTop: 4,
   },
 });
