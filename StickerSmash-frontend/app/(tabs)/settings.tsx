@@ -1,12 +1,14 @@
 import { ThemeContext } from '@/components/theme-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import i18n from '@/i18n';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { router } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
@@ -24,6 +26,7 @@ import {
 
 export default function SettingsScreen() {
   const { dark, toggleTheme, colors } = useContext(ThemeContext);
+  const { t } = useTranslation();
 
   const [name, setName] = useState('Hassan Tahir');
   const [username, setUsername] = useState('');
@@ -173,14 +176,21 @@ export default function SettingsScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.row} onPress={toggleTheme}>
-            <ThemedText style={{ color: colors.text }}>🌙 Dark Mode</ThemedText>
+            <ThemedText style={{ color: colors.text }}>🌙 {t('darkMode')}</ThemedText>
             <ThemedText style={{ color: dark ? colors.primary : colors.text, opacity: 0.6 }}>
               {dark ? 'Enabled' : 'Disabled'}
             </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.row}>
-            <ThemedText style={{ color: colors.text }}>🌍 Language</ThemedText>
+            <ThemedText style={{ color: colors.text }} onPress={() => {
+              const newLanguage = i18n.language === 'en' ? 'ur' : 'en';
+              i18n.changeLanguage(newLanguage);
+            }}>🌍 {t('language')}</ThemedText>
+
+            <ThemedText style={{ color: colors.text }}>
+              {i18n.language === 'en' ? 'English' : 'اردو'}
+            </ThemedText>
           </TouchableOpacity>
         </ThemedView>
 
