@@ -16,35 +16,47 @@ const SECRET = process.env.JWT_SECRET;
 // ================= CONNECT MONGODB =================
 
 
+
 const connectDB = async () => {
   try {
     console.log("🔄 Connecting to MongoDB...");
 
-    console.log("📡 DB URL (masked):", process.env.DB_URL?.replace(/:.+@/, ':****@'));
-
     await mongoose.connect(process.env.DB_URL);
 
-    console.log("✅ MongoDB Connected Successfully");
+    console.log("✅ MongoDB Connected");
   } catch (error) {
     console.error("❌ MongoDB Connection Failed");
-    console.error("🔴 Error Name:", error.name);
-    console.error("🔴 Error Message:", error.message);
-
-    // extra debug info
-    if (error.reason) {
-      console.error("🧠 Reason:", error.reason);
-    }
-
-    process.exit(1); // stop server so you clearly see failure
+    console.error(error);
+    process.exit(1);
   }
 };
 
-connectDB();
+
+
 
 // ================= USER MODEL =================
 const UserSchema = new mongoose.Schema({
-  username: String,
-  password: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
+  password: {
+    type: String,
+    required: true,
+  },
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -133,6 +145,17 @@ app.get('/profile', verifyToken, (req, res) => {
   });
 });
 
+
+// ================= START SERVER =================
+
+app.get("/", (req, res) => {
+  res.send("API Running");
+});
+connectDB();
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 
 
 
